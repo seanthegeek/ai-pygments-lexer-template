@@ -1,0 +1,39 @@
+{
+    "files.associations": {
+        "*.prompt.md": "markdown"
+    },
+    "markdownlint.config": {
+        "MD010": { "code_blocks": false },
+        "MD040": false
+    },
+    "cSpell.words": [
+        "analyse",
+        "bygroups",
+        "elif",
+        "examplefiles",
+        "frozenset",
+        "htmlcov",
+        "isinstance",
+        "linenos",
+        "metaclass",
+        "mimetypes",
+        "myapp",
+        "noqa",
+        "pathlib",
+        "pycache",
+        "pygmentize",
+        "Pygments",
+        "pyproject",
+        "pytest",
+        "repr",
+        "safestring",
+        "setuptools",
+        "startswith",
+        "staticmethod",
+        "templatetags",
+        "testpaths",
+        "tokentype",
+        "Whalen",
+        "yourusername"
+    ]
+}
