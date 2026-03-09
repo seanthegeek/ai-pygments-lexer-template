@@ -183,9 +183,9 @@ __all__ = ['{{LANGUAGE_CLASS_NAME}}']
   strings → operators/punctuation → literals → keywords/identifiers.
 - Use sub-states for block comments, double-quoted strings, single-quoted strings,
   and any other paired delimiters the language has.
-- Include `analyse_text` heuristics derived from distinctive patterns found in the
-  documentation. The signature is `def analyse_text(text):` — no `self` parameter
-  and no `@staticmethod` decorator; Pygments handles dispatch via its metaclass.
+-- The `analyze_text` method **must** have the signature
+  `def analyze_text(self, text: str) -> float:` — a regular instance method with
+  `self` and a return type annotation. Do **not** use `@staticmethod`.
 - Study the Pygments `GoLexer` (`pygments/lexers/go.py`) and `SqlLexer`
   (`pygments/lexers/sql.py`) for structural patterns before writing.
 

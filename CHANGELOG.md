@@ -16,8 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   preview server, terminal preview script, `AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`,
   `LICENSE`, `.gitignore`, `.vscode/settings.json`
 - Follows Pygments coding conventions: `words()` helper for keyword matching inline
-  in the `tokens` dict, `def analyse_text(text):` signature (no `self`, no
-  `@staticmethod`), and `url` class attribute pointing to the language homepage
+  in the `tokens` dict, `def analyze_text(self, text: str) -> float:` instance
+  method signature (not `@staticmethod`), and `url` class attribute pointing to the
+  language homepage
 - Mandatory documentation-fetch verification workflow embedded in `AGENTS.md` to
   prevent hallucinated syntax
 - Flask and Django usage examples in the generated `README.md`
