@@ -5,9 +5,7 @@ description: 'Generate a complete Pygments lexer package project for a new langu
 
 # Create a Pygments Lexer Package for {{LANGUAGE_NAME}}
 
-You are scaffolding a complete Python package that provides a Pygments syntax-highlighting
-lexer for **{{LANGUAGE_NAME}}**. Pygments is the default syntax highlighter used by
-Sphinx, MkDocs, and many other Python documentation tools.
+You are building a complete Python package  project that provides a Pygments syntax-highlighting lexer for **{{LANGUAGE_NAME}}**. Pygments is the default syntax highlighter used by Sphinx, MkDocs, and many other Python documentation tools.
 
 **Fill in these values before running this prompt:**
 
@@ -338,7 +336,7 @@ if DEBUG:
     for index, tokentype, value in lexer.get_tokens_unprocessed(sample):
         print(f'{tokentype!s:<45} {value!r}')
 else:
-    print(highlight(sample, lexer, Terminal256Formatter(style=get_style_by_name('github-dark'))))
+    print(highlight(sample, lexer, Terminal256Formatter(style=get_style_by_name('material'))))
 ```
 
 ---
@@ -371,14 +369,14 @@ SAMPLE_PATH = 'tests/examplefiles/sample.{{EXT}}'
 @app.get('/')
 def index():
     lexer     = {{LANGUAGE_CLASS_NAME}}()
-    formatter = HtmlFormatter(style=get_style_by_name('github-dark'))
+    formatter = HtmlFormatter(style=get_style_by_name('material'))
     theme_css = formatter.get_style_defs('.highlight')
 
     demo   = open(DEMO_PATH).read()
     sample = open(SAMPLE_PATH).read()
 
-    highlighted_demo   = highlight(demo,   lexer, HtmlFormatter(style=get_style_by_name('github-dark')))
-    highlighted_sample = highlight(sample, lexer, HtmlFormatter(style=get_style_by_name('github-dark')))
+    highlighted_demo   = highlight(demo,   lexer, HtmlFormatter(style=get_style_by_name('material')))
+    highlighted_sample = highlight(sample, lexer, HtmlFormatter(style=get_style_by_name('material')))
 
     body = f"""<!DOCTYPE html>
 <html>
@@ -434,87 +432,134 @@ dependencies = [
 
 ## Usage
 
-Once installed, Pygments will automatically discover the lexer via its entry point.
-You can use `{{LANGUAGE_SHORT_NAME}}` as the language tag in fenced code blocks
-(see the lexer definition for additional aliases):
+Once installed, the lexer is automatically available to Pygments via the plugin
+entry point. You can use it with any Pygments-compatible tool.
+
+### Command line (pygmentize)
+
+```bash
+pygmentize -l {{LANGUAGE_SHORT_NAME}} example.{{EXT}}
+pygmentize -l yara-l example.{{EXT}}
+```
+
+### Python API
+
+```python
+from pygments import highlight
+from pygments.formatters import TerminalFormatter
+from {{PACKAGE_NAME}} import {{LANGUAGE_CLASS_NAME}}
+
+code = open('example.{{EXT}}').read()
+print(highlight(code, {{LANGUAGE_CLASS_NAME}}(), TerminalFormatter()))
+```
+
+### Terminal preview
+
+```bash
+python preview.py
+DEBUG=1 python preview.py   # Print each token and its type
+```
+
+### Visual preview server
+
+```bash
+pip install '{{PACKAGE_NAME}}[server]'
+python server.py
+# Then open http://localhost:8080
+```
+
+### MkDocs
+
+Install `{{PACKAGE_NAME}}` alongside MkDocs. The lexer is picked up
+automatically via the Pygments plugin entry point, so no extra configuration is
+required. Use the `{{LANGUAGE_SHORT_NAME}}` language identifier in fenced code blocks:
 
 ````markdown
 ```{{LANGUAGE_SHORT_NAME}}
-# your code here
+rule example {
+  events:
+    $e.metadata.event_type = "NETWORK_CONNECTION"
+  condition:
+    $e
+}
 ```
 ````
 
-## Sphinx / MkDocs
+### Sphinx
 
-Install the package and Pygments will discover the lexer automatically:
+Install `{{PACKAGE_NAME}}` in the same environment as Sphinx. The lexer
+registers itself automatically, so it is available in `code-block` directives
+without any additional configuration:
 
-```sh
-pip install {{PACKAGE_NAME}}
+```rst
+.. code-block:: {{LANGUAGE_SHORT_NAME}}
+
+   rule example {
+     events:
+       $e.metadata.event_type = "NETWORK_CONNECTION"
+     condition:
+       $e
+   }
 ```
 
-Then use the language alias in `.. code-block::` directives or fenced code blocks.
-No additional Sphinx or MkDocs configuration is required.
+### Flask
 
-## Flask
-
-Install the package, then use `pygments.highlight()` in your views. The CSS for
-the chosen style must be included in the page — generate it once and pass it to
-your template:
+Use Pygments directly to render highlighted HTML and serve it from a Flask
+route:
 
 ```python
+from flask import Flask, Markup
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
-from pygments.lexers import get_lexer_by_name
-from flask import render_template_string
+from {{PACKAGE_NAME}} import {{LANGUAGE_CLASS_NAME}}
 
-@app.route('/example')
-def example():
-    lexer = get_lexer_by_name('{{LANGUAGE_SHORT_NAME}}')
-    formatter = HtmlFormatter(style='default')
-    highlighted = highlight(YOUR_CODE, lexer, formatter)
-    css = formatter.get_style_defs('.highlight')
-    return render_template_string(
-        '<style>{{ css }}</style>{{ code }}',
-        css=css, code=highlighted,
-    )
+app = Flask(__name__)
+formatter = HtmlFormatter()
+
+@app.route("/highlight")
+def highlight_rule():
+    code = open("example.{{EXT}}").read()
+    highlighted = highlight(code, {{LANGUAGE_CLASS_NAME}}(), formatter)
+    css = f"<style>{formatter.get_style_defs('.highlight')}</style>"
+    return css + highlighted
 ```
 
-## Django
+### Django
 
-Install the package, then use `pygments.highlight()` in a view or create a
-reusable template filter:
+Add Pygments to your Django project and call it from a view or template tag:
 
 ```python
-# myapp/templatetags/pygments_tags.py
-from django import template
+# views.py
 from django.utils.safestring import mark_safe
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
-from pygments.lexers import get_lexer_by_name
+from {{PACKAGE_NAME}} import {{LANGUAGE_CLASS_NAME}}
 
-register = template.Library()
+formatter = HtmlFormatter()
 
-@register.simple_tag
-def highlight_code(code, language='{{LANGUAGE_SHORT_NAME}}', style='default'):
-    lexer = get_lexer_by_name(language)
-    formatter = HtmlFormatter(style=style)
-    return mark_safe(highlight(code, lexer, formatter))
-
-@register.simple_tag
-def pygments_css(style='default'):
-    return mark_safe(
-        f'<style>{HtmlFormatter(style=style).get_style_defs(".highlight")}</style>'
-    )
+def highlight_rule(request):
+    from django.shortcuts import render
+    code = open("example.{{EXT}}").read()
+    highlighted = highlight(code, {{LANGUAGE_CLASS_NAME}}(), formatter)
+    css = formatter.get_style_defs(".highlight")
+    return render(request, "highlight.html", {
+        "css": mark_safe(css),
+        "code": mark_safe(highlighted),
+    })
 ```
 
-Load the tag in your template and call both tags — `pygments_css` once in
-`<head>` and `highlight_code` wherever you need highlighted output:
-
-```django
-{% load pygments_tags %}
-{% pygments_css %}
-{% highlight_code source_code %}
+```html
+{# highlight.html #}
+<style>{{ css }}</style>
+{{ code }}
 ```
+
+## Supported aliases
+
+| Alias       | Description             |
+|-------------|-------------------------|
+| `example`   | Primary alias           |
+| `example-2` | Alternative alias       |
 
 ## Development
 
@@ -547,19 +592,6 @@ Enable debug mode to print each token and its value:
 ```sh
 DEBUG=1 python preview.py
 ```
-
-### Iterative testing workflow
-
-1. Run `pytest` to check for test failures and error tokens.
-2. Start the server with `python server.py`.
-3. In another terminal, check for error tokens in the rendered output:
-
-   ```sh
-   curl -s http://localhost:8080 | grep 'class="err"'
-   ```
-
-4. Fix any error tokens in `pygments_lexer_{{LANGUAGE_SHORT_NAME}}/_lexer.py`.
-5. Repeat until no error tokens remain.
 
 ## License
 
@@ -615,6 +647,10 @@ code in this repository.
 ---
 
 ### `AGENTS.md`
+
+**Copy the Documentation section below into the generated file
+exactly as provided. Do not omit, consolidate, or reorder any URL, even if
+they appear redundant or similar.**
 
 ```markdown
 # AGENTS.md
@@ -698,30 +734,54 @@ Before adding ANY individual keyword, function, or syntax element:
   in this file. If a URL doesn't work, say so — do not guess an alternative.
 - **Do NOT assume a function exists because a similar one does.**
 
-### Self-verification
+## Development
 
-After making changes, verify correctness by **re-fetching the source documentation**
-and confirming every added element appears in the fetched HTML. Do not verify by
-re-reading your own changes.
+Install dependencies:
+
+```sh
+pip install -e ".[dev,server]"
+```
+
+Run the test suite:
+
+```sh
+pytest
+```
+
+Start the visual preview server (available at http://localhost:8080):
+
+```sh
+python server.py
+```
+
+Run the terminal preview script:
+
+```sh
+python preview.py
+```
+
+Enable debug mode to print each token and its value:
+
+```sh
+DEBUG=1 python preview.py
+```
+
+### Iterative testing workflow
+
+1. Run `pytest -v` — this directly inspects every `Token.Error` in the lexer output and is the authoritative check.
+2. Optionally start `python server.py` for a visual review of token coloring (useful for spotting wrong token *types*, not error tokens).
+3. Fix any errors in `{{PACKAGE_NAME}}/_lexer.py`.
+4. Repeat until `pytest` passes with zero error tokens.
+
+## Self-verification
+
+After making changes, verify correctness by **re-fetching the source documentation** and confirming every added element appears in the fetched HTML. Do not verify by re-reading your own changes — verify against the external source.
 
 ### Constraints (applies to all work)
 
-- **No hallucinated syntax.** Every keyword, function, operator, and language
-  construct in the lexer must come from the official documentation listed above.
-- **Follow Pygments conventions exactly.** Study existing lexers (especially the
-  JSON/data lexer and SQL lexer) for patterns. Don't invent novel approaches.
-- **The Error token count is the ground truth.** The visual preview server is the
-  authoritative test. `pytest` passing is necessary but not sufficient — you must
-  also have zero `class="err"` spans.
-- **Iterate until clean.** Do not declare the task complete until both `pytest`
-  passes AND the Error token count is zero for both demo and visual sample.
-- **Update the visual sample** (`tests/examplefiles/sample.{{EXT}}`)
-  whenever new tokens are added to the lexer, so every token type has coverage.
-
-The markdownlint configuration in [.vscode/settings.json](.vscode/settings.json)
-sets `MD024` to `siblings_only: true`, allowing repeated heading text under
-different parent headings (e.g. `### Added` appearing under multiple version
-sections in the changelog).
+- **No hallucinated syntax.** Every keyword, function, operator, and language construct in the lexer must come from the official documentation listed above. for patterns. Don't invent novel approaches.
+- **`pytest` is the ground truth for error tokens.** The test suite calls `lexer.get_tokens(text)` directly and asserts that no token has type `Token.Error`. This is more reliable than scraping HTML.
+- **Iterate until clean.** Do not declare the task complete until both `pytest` passes AND the Error token count is zero for both demo and visual sample.
 
 ## Changelog
 
@@ -743,8 +803,8 @@ changelog:
 Before considering the project complete, verify:
 
 - [ ] `pytest` passes with no test failures
-- [ ] `curl -s http://localhost:8080 | grep 'class="err"'` returns nothing
-- [ ] Every token type defined in the lexer has at least one example in the visual sample
+- [ ] Complete coverage of the language based on the documentation URLs
 - [ ] Every keyword/function in the lexer is traceable to a documentation URL
 - [ ] `README.md`, `AGENTS.md`, `CLAUDE.md`, and `CHANGELOG.md` are accurate
 - [ ] The `pyproject.toml` version is `0.1.0` and metadata URLs are correct
+- [ ] The Documentation section is copied verbatim in `AGENTS.md` — none omitted or merged
