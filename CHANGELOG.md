@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Suppress markdownlint MD048 (code fence style) and MD050 (strong style) in `.vscode/settings.json`
+- `Colors` section to the generated `README.md` template.
 
 ### Removed
 
