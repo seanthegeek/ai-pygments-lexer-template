@@ -405,7 +405,7 @@ if __name__ == '__main__':
 
 ### `README.md`
 
-````markdown
+~~~markdown
 # {{PACKAGE_NAME}}
 
 A Pygments lexer plugin for {{LANGUAGE_DESCRIPTION}}. Pygments is the default
@@ -439,7 +439,7 @@ entry point. You can use it with any Pygments-compatible tool.
 
 ```bash
 pygmentize -l {{LANGUAGE_SHORT_NAME}} example.{{EXT}}
-pygmentize -l yara-l example.{{EXT}}
+pygmentize -l {{LANGUAGE_SHORT_NAME} example.{{EXT}}
 ```
 
 ### Python API
@@ -474,16 +474,11 @@ Install `{{PACKAGE_NAME}}` alongside MkDocs. The lexer is picked up
 automatically via the Pygments plugin entry point, so no extra configuration is
 required. Use the `{{LANGUAGE_SHORT_NAME}}` language identifier in fenced code blocks:
 
-````markdown
+~~~markdown
 ```{{LANGUAGE_SHORT_NAME}}
-rule example {
-  events:
-    $e.metadata.event_type = "NETWORK_CONNECTION"
-  condition:
-    $e
-}
+example code
 ```
-````
+~~~
 
 ### Sphinx
 
@@ -494,12 +489,7 @@ without any additional configuration:
 ```rst
 .. code-block:: {{LANGUAGE_SHORT_NAME}}
 
-   rule example {
-     events:
-       $e.metadata.event_type = "NETWORK_CONNECTION"
-     condition:
-       $e
-   }
+   code example
 ```
 
 ### Flask
@@ -517,7 +507,7 @@ app = Flask(__name__)
 formatter = HtmlFormatter()
 
 @app.route("/highlight")
-def highlight_rule():
+def highlight_code():
     code = open("example.{{EXT}}").read()
     highlighted = highlight(code, {{LANGUAGE_CLASS_NAME}}(), formatter)
     css = f"<style>{formatter.get_style_defs('.highlight')}</style>"
@@ -537,7 +527,7 @@ from {{PACKAGE_NAME}} import {{LANGUAGE_CLASS_NAME}}
 
 formatter = HtmlFormatter()
 
-def highlight_rule(request):
+def highlight_code(request):
     from django.shortcuts import render
     code = open("example.{{EXT}}").read()
     highlighted = highlight(code, {{LANGUAGE_CLASS_NAME}}(), formatter)
@@ -597,7 +587,7 @@ DEBUG=1 python preview.py
 
 MIT
 
-````
+~~~
 
 ---
 
@@ -794,6 +784,7 @@ changelog:
 - Use `### Added`, `### Changed`, `### Removed` as second-level section headings
 - Use `#### Category name` as optional third-level headings within a section
 - Ensure blank lines surround all headings to satisfy markdownlint
+
 ```
 
 ---

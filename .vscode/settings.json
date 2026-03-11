@@ -5,7 +5,9 @@
     "markdownlint.config": {
         "MD010": { "code_blocks": false },
         "MD024": { "siblings_only": true },
-        "MD040": false
+        "MD040": false,
+        "MD048": false,
+        "MD050": false
     },
     "cSpell.words": [
         "analyse",
@@ -35,6 +37,7 @@
         "testpaths",
         "tokentype",
         "Whalen",
+        "yara",
         "yourusername"
     ]
 }
